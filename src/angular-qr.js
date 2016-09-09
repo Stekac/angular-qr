@@ -47,6 +47,16 @@
       return true;
     };
 
+    $scope.getColorFor = function(color, option){
+      if(option === 'background'){
+        return color || '#000';
+      }
+
+      if(option === 'foreground'){
+        return color || '#fff';
+      }
+    }
+
     $scope.checkInputMode = function(inputMode, text){
       if (inputMode === 'NUMBER' && !$scope.isNUMBER(text)) {
         throw new Error('The `NUMBER` input mode is invalid for text.');
@@ -84,7 +94,9 @@
         inputMode: '=',
         size: '=',
         text: '=',
-        image: '='
+        image: '=',
+        background: '=',
+        foreground: '='
       },
       controller: 'QrCtrl',
       link: function postlink(scope, element, attrs){
@@ -101,6 +113,8 @@
         scope.CORRECTION = scope.getCorrection();
         scope.SIZE = scope.getSize();
         scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
+        scope.BACKGROUND_COLOR = scope.getColorFor(background, 'background');
+        scope.FOREGROUND_COLOR = scope.getColorFor(foreground, 'foreground');
         scope.canvasImage = '';
 
         var draw = function(context, qr, modules, tile){
@@ -108,7 +122,7 @@
             for (var col = 0; col < modules; col++) {
               var w = (Math.ceil((col + 1) * tile) - Math.floor(col * tile)),
                   h = (Math.ceil((row + 1) * tile) - Math.floor(row * tile));
-              context.fillStyle = qr.isDark(row, col) ? '#000' : '#fff';
+              context.fillStyle = qr.isDark(row, col) ? scope.BACKGROUND_COLOR : scope.FOREGROUND_COLOR;
               context.fillRect(Math.round(col * tile), Math.round(row * tile), w, h);
             }
           }
