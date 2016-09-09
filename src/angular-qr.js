@@ -113,8 +113,8 @@
         scope.CORRECTION = scope.getCorrection();
         scope.SIZE = scope.getSize();
         scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
-        scope.BACKGROUND_COLOR = scope.getColorFor(background, 'background');
-        scope.FOREGROUND_COLOR = scope.getColorFor(foreground, 'foreground');
+        scope.BACKGROUND_COLOR = scope.getColorFor(scope.background, 'background');
+        scope.FOREGROUND_COLOR = scope.getColorFor(scope.foreground, 'foreground');
         scope.canvasImage = '';
 
         var draw = function(context, qr, modules, tile){
