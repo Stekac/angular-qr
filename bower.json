@@ -1,15 +1,15 @@
 {
   "name": "angular-qr",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "QR code generator for AngularJS",
   "keywords": ["qr", "qrcode", "angular"],
-  "authors": ["Jan Antala <hello@janantala.com>"],
+  "authors": ["Jan Antala <hello@janantala.com>, Stefan Dejanovski <stefan.dejanovski@gmail.com>"],
   "license": "MIT",
   "homepage": "https://github.com/janantala/angular-qr",
   "main": "./src/angular-qr.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/janantala/angular-qr.git"
+    "url": "https://github.com/Stekac/angular-qr.git"
   },
   "ignore": [
     "**/.*",
