@@ -49,11 +49,11 @@
 
     $scope.getColorFor = function(color, option){
       if(option === 'background'){
-        return color || '#000';
+        return color || '#fff';
       }
 
       if(option === 'foreground'){
-        return color || '#fff';
+        return color || '#000';
       }
     }
 
@@ -122,7 +122,7 @@
             for (var col = 0; col < modules; col++) {
               var w = (Math.ceil((col + 1) * tile) - Math.floor(col * tile)),
                   h = (Math.ceil((row + 1) * tile) - Math.floor(row * tile));
-              context.fillStyle = qr.isDark(row, col) ? scope.BACKGROUND_COLOR : scope.FOREGROUND_COLOR;
+              context.fillStyle = qr.isDark(row, col) ? scope.FOREGROUND_COLOR : scope.BACKGROUND_COLOR;
               context.fillRect(Math.round(col * tile), Math.round(row * tile), w, h);
             }
           }
