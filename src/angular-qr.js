@@ -96,7 +96,8 @@
         text: '=',
         image: '=',
         background: '=',
-        foreground: '='
+        foreground: '=',
+        outlineModules: '='
       },
       controller: 'QrCtrl',
       link: function postlink(scope, element, attrs){
@@ -116,6 +117,7 @@
         scope.BACKGROUND_COLOR = scope.getColorFor(scope.background, 'background');
         scope.FOREGROUND_COLOR = scope.getColorFor(scope.foreground, 'foreground');
         scope.canvasImage = '';
+        scope.OUTLINE_MODULES = scope.outlineModules || false;
 
         var draw = function(context, qr, modules, tile){
           for (var row = 0; row < modules; row++) {
@@ -145,6 +147,11 @@
           if (canvas2D) {
             draw(context, qr, modules, tile);
             scope.canvasImage = canvas.toDataURL() || '';
+            if(scope.OUTLINE_MODULES){
+              angular.element(canvas).css({
+                'outline' : (tile * scope.OUTLINE_MODULES)+'px solid '+ scope.BACKGROUND_COLOR
+              })
+            }
           }
         };
 
@@ -186,6 +193,31 @@
               render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
             }
           });
+
+          scope.$watch('foreground', function(value, old){
+            scope.FOREGROUND_COLOR = scope.getColorFor(value, 'foreground');
+            if (value !== old) {
+              scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
+              render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
+            }
+          });
+
+          scope.$watch('background', function(value, old){
+            scope.BACKGROUND_COLOR = scope.getColorFor(value, 'background');
+            if (value !== old) {
+              scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
+              render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
+            }
+          });
+
+          scope.$watch('outlineModules', function(value, old){
+            scope.OUTLINE_MODULES = value;
+            if (value !== old) {
+              scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
+              render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
+            }
+          });
+
         });
 
       }
