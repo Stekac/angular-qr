@@ -97,8 +97,7 @@
         image: '=',
         background: '=',
         foreground: '=',
-        outlineModules: '=',
-        transparentBackground: '='
+        outlineModules: '='
       },
       controller: 'QrCtrl',
       link: function postlink(scope, element, attrs){
@@ -118,22 +117,34 @@
         scope.BACKGROUND_COLOR = scope.getColorFor(scope.background, 'background');
         scope.FOREGROUND_COLOR = scope.getColorFor(scope.foreground, 'foreground');
         scope.canvasImage = '';
-        scope.OUTLINE_MODULES = scope.outlineModules || false;
-        scope.TRANSPARENT_BACKGROUND = scope.transparentBackground || false;
+        scope.OUTLINE_MODULES = parseInt(scope.outlineModules) || 0;
 
-        var draw = function(context, qr, modules, tile){
+        var drawOutline = function(context, qr, modules, tile, outline){
+          context.fillStyle = scope.BACKGROUND_COLOR;
+          //left outline
+          context.fillRect(0, 0, Math.floor(outline), Math.floor((outline * 2) + scope.SIZE));
+
+          //right outline
+          context.fillRect(Math.floor(scope.SIZE + outline), 0, outline, Math.floor((outline * 2) + scope.SIZE));
+
+          //top outline
+          context.fillRect(outline, 0, Math.floor(scope.SIZE), Math.floor(outline));
+
+          //bottom outline
+          context.fillRect(outline, Math.floor(outline + scope.SIZE), Math.floor(scope.SIZE), Math.floor(outline));
+        }
+
+        var draw = function(context, qr, modules, tile, outline){
           for (var row = 0; row < modules; row++) {
             for (var col = 0; col < modules; col++) {
-              var w = (Math.ceil((col + 1) * tile) - Math.floor(col * tile)),
-              h = (Math.ceil((row + 1) * tile) - Math.floor(row * tile));
-              if(scope.TRANSPARENT_BACKGROUND){
-                context.fillStyle = qr.isDark(row, col) ? scope.FOREGROUND_COLOR : 'rgba(0,0,0,0)';
-              }else{
-                context.fillStyle = qr.isDark(row, col) ? scope.FOREGROUND_COLOR : scope.BACKGROUND_COLOR;
-              }
-              context.fillRect(Math.round(col * tile), Math.round(row * tile), w, h);
+              var w = (Math.floor((col + 1) * tile) - Math.floor(col * tile)),
+              h = (Math.floor((row + 1) * tile) - Math.floor(row * tile));
+              context.fillStyle = qr.isDark(row, col) ? scope.FOREGROUND_COLOR : scope.BACKGROUND_COLOR;
+              context.fillRect(Math.floor(col * tile) + outline, Math.floor(row * tile) + outline, w, h);
             }
           }
+
+          drawOutline(context, qr, modules, tile, outline);
         };
 
         var render = function(canvas, value, typeNumber, correction, size, inputMode){
@@ -148,23 +159,12 @@
 
           var modules = qr.getModuleCount();
           var tile = size / modules;
-          canvas.width = canvas.height = size;
+          var outline = Math.floor(tile * scope.OUTLINE_MODULES);
+          canvas.width = canvas.height = size + (2 * outline);
 
           if (canvas2D) {
-            draw(context, qr, modules, tile);
+            draw(context, qr, modules, tile, outline);
             scope.canvasImage = canvas.toDataURL() || '';
-            if(scope.OUTLINE_MODULES){
-              if(scope.TRANSPARENT_BACKGROUND){
-                angular.element(canvas).css({
-                  'outline' : (tile * scope.OUTLINE_MODULES)+'px solid '+ 'rgba(0,0,0,0)'
-                })
-              }else{
-                angular.element(canvas).css({
-                  'outline' : (tile * scope.OUTLINE_MODULES)+'px solid '+ scope.BACKGROUND_COLOR
-                })
-              }
-
-            }
           }
         };
 
@@ -225,14 +225,6 @@
 
           scope.$watch('outlineModules', function(value, old){
             scope.OUTLINE_MODULES = value;
-            if (value !== old) {
-              scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
-              render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
-            }
-          });
-
-          scope.$watch('transparentBackground', function(value, old){
-            scope.TRANSPARENT_BACKGROUND = value;
             if (value !== old) {
               scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
               render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
