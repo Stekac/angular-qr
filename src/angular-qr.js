@@ -97,7 +97,8 @@
         image: '=',
         background: '=',
         foreground: '=',
-        outlineModules: '='
+        outlineModules: '=',
+        rotation: '='
       },
       controller: 'QrCtrl',
       link: function postlink(scope, element, attrs){
@@ -118,6 +119,7 @@
         scope.FOREGROUND_COLOR = scope.getColorFor(scope.foreground, 'foreground');
         scope.canvasImage = '';
         scope.OUTLINE_MODULES = parseInt(scope.outlineModules) || 0;
+        scope.ROTATION = scope.rotation || 0;
 
         var drawOutline = function(context, qr, modules, tile, outline){
           context.fillStyle = scope.BACKGROUND_COLOR;
@@ -164,6 +166,11 @@
 
           if (canvas2D) {
             draw(context, qr, modules, tile, outline);
+
+            angular.element(canvas).css({
+              'transform': 'rotate('+scope.ROTATION+'deg)'
+            });
+
             scope.canvasImage = canvas.toDataURL() || '';
           }
         };
@@ -225,6 +232,14 @@
 
           scope.$watch('outlineModules', function(value, old){
             scope.OUTLINE_MODULES = value;
+            if (value !== old) {
+              scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
+              render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
+            }
+          });
+
+          scope.$watch('rotation', function(value, old){
+            scope.ROTATION = value;
             if (value !== old) {
               scope.INPUT_MODE = scope.getInputMode(scope.TEXT);
               render(canvas, scope.TEXT, scope.TYPE_NUMBER, scope.CORRECTION, scope.SIZE, scope.INPUT_MODE);
